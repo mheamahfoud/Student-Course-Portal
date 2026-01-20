@@ -15,9 +15,10 @@ class Student:
     def enroll_in_course(self, course):
         """Enroll student in a course"""
         if course not in self.enrolled_courses:
-            self.enrolled_courses.append(course)
-            course.add_student(self)
-            return True
+            if course.add_student(self):
+                self.enrolled_courses.append(course)
+                return True
+            return False
         return False
     
     def drop_course(self, course):
@@ -48,11 +49,10 @@ class Course:
     
     def add_student(self, student):
         """Add a student to the course"""
-        if len(self.enrolled_students) < self.max_capacity:
-            if student not in self.enrolled_students:
-                self.enrolled_students.append(student)
-                return True
-        return False
+        if len(self.enrolled_students) >= self.max_capacity or student in self.enrolled_students:
+            return False
+        self.enrolled_students.append(student)
+        return True
     
     def remove_student(self, student):
         """Remove a student from the course"""
