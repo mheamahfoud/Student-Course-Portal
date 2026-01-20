@@ -33,13 +33,15 @@ fastapi==0.115.12
 fastapi-pagination==0.14.0
 fastapi_keycloak==1.1.0
 filetype==1.2.0
-google-ai-generativelanguage==0.6.15
+# Google AI + Generative AI stack
+google-ai-generativelanguage==0.6.18
 google-api-core==2.25.1
 google-api-python-client==2.176.0
 google-auth==2.40.3
 google-auth-httplib2==0.2.0
-google-generativeai==0.8.5
+google-generativeai>=0.9.0   # upgrade so it supports 0.6.18
 googleapis-common-protos==1.70.0
+langchain-google-genai==2.1.8
 greenlet==3.2.3
 grpcio==1.73.1
 grpcio-status==1.71.2
