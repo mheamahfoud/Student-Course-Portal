@@ -1,0 +1,7 @@
+# Student Course Portal - Requirements
+
+# No external dependencies required for core functionality
+# Python 3.6+ only
+
+# Optional: For running tests with pytest instead of unittest
+# pytest>=7.0.0
