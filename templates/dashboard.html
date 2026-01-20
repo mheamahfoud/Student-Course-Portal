@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="logo">
+            <h2><i class="fas fa-graduation-cap"></i> Student Portal</h2>
+        </div>
+        <ul>
+            <li><a href="/dashboard/"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="/offerings/"><i class="fas fa-book-open"></i> Browse Courses</a></li>
+            <li><a href="/logout/" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <!-- Welcome Section -->
+        <div class="welcome-card">
+            <div class="welcome-header">
+                <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+                <div class="user-info">
+                    <div class="avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <h2>Welcome back, <span class="user-name">{{ user.name }}</span>!</h2>
+                        <p class="user-email">{{ user.email }}</p>
+                        <p class="member-since">Member since: <span>Jan 2024</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #3498db;">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ subscriptions|length }}</h3>
+                        <p>Active Courses</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #2ecc71;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>12</h3>
+                        <p>Learning Hours</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #9b59b6;">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>3</h3>
+                        <p>Achievements</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e74c3c;">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>2</h3>
+                        <p>Upcoming Deadlines</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscribed Offerings Section -->
+        <div class="courses-section">
+            <div class="section-header">
+                <h2><i class="fas fa-bookmark"></i> Your Subscribed Courses</h2>
+                <a href="/offerings/" class="browse-btn">Browse More <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            {% if subscriptions %}
+            <div class="courses-grid">
+                {% for subscription in subscriptions %}
+                <div class="course-card">
+                    <div class="course-header" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                        <h3>{{ subscription.offering.title }}</h3>
+                        <span class="course-category">Programming</span>
+                    </div>
+                    <div class="course-body">
+                        <p class="course-description">Master the fundamentals of this course with hands-on projects and expert guidance.</p>
+                        
+                        <div class="course-progress">
+                            <div class="progress-label">
+                                <span>Progress</span>
+                                <span>65%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="course-details">
+                            <div class="detail-item">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>Dr. {{ subscription.offering.instructor|default:"John Smith" }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Ends: {{ subscription.offering.end_date|default:"Dec 15, 2024" }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="course-actions">
+                            <a href="/course/{{ subscription.offering.id }}" class="btn-primary">
+                                <i class="fas fa-play-circle"></i> Continue Learning
+                            </a>
+                            <a href="/course/{{ subscription.offering.id }}/resources" class="btn-secondary">
+                                <i class="fas fa-download"></i> Resources
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>No Courses Yet</h3>
+                <p>You haven't subscribed to any courses yet. Start your learning journey today!</p>
+                <a href="/offerings/" class="btn-primary">Browse Courses</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="activity-section">
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> Recent Activity</h2>
+            </div>
+            
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-video" style="color: #3498db;"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Completed: Introduction to Python</h4>
+                        <p>You've completed the video lecture on Python fundamentals</p>
+                        <span class="activity-time">2 hours ago</span>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-file-alt" style="color: #2ecc71;"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Submitted Assignment</h4>
+                        <p>Web Development Project submitted successfully</p>
+                        <span class="activity-time">Yesterday, 3:45 PM</span>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-comment" style="color: #9b59b6;"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>New Comment</h4>
+                        <p>You commented on "Data Structures Discussion"</p>
+                        <span class="activity-time">2 days ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links">
+            <h2><i class="fas fa-rocket"></i> Quick Actions</h2>
+            <div class="links-grid">
+                <a href="/offerings/" class="quick-link">
+                    <i class="fas fa-search"></i>
+                    <span>Find New Courses</span>
+                </a>
+                <a href="/calendar" class="quick-link">
+                    <i class="fas fa-calendar"></i>
+                    <span>View Calendar</span>
+                </a>
+                <a href="/profile" class="quick-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Account Settings</span>
+                </a>
+                <a href="/help" class="quick-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Get Help</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <p>© 2024 Student Portal. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+            <a href="/contact">Contact Us</a>
+        </div>
+    </footer>
+</body>
+</html>

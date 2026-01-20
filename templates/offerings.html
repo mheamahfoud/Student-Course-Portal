@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Offerings</title>
+    <link rel="stylesheet" href="/static/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function subscribe(offeringId, button) {
+            const btn = button || event?.target;
+            const originalText = btn.innerHTML;
+
+            // Show loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                const csrftoken = getCookie('csrftoken');
+                const response = await fetch('/ajax/subscribe', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: JSON.stringify({ offering_id: offeringId }),
+                });
+
+                const result = await response.json();
+
+                if (response.status === 401) {
+                    // Not authenticated — redirect to login
+                    window.location.href = '/login/?next=/offerings';
+                    return;
+                }
+
+                if (result.success) {
+                    btn.innerHTML = '<i class="fas fa-check"></i> Subscribed';
+                    btn.style.background = '#2ecc71';
+                    btn.style.cursor = 'default';
+                    btn.disabled = true;
+                    alert(result.message || 'Successfully subscribed!');
+                } else {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert('Network error. Please try again.');
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Simple Navigation -->
+    <div class="navbar">
+        <div class="logo">
+            <h2><i class="fas fa-graduation-cap"></i> Courses</h2>
+        </div>
+        <ul>
+            <li><a href="/dashboard/">Dashboard</a></li>
+            <li><a href="/offerings/" class="active">All Courses</a></li>
+            <li><a href="/logout/">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Simple Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-book-open"></i> Available Courses</h1>
+        <p>Browse and subscribe to courses that interest you</p>
+    </div>
+
+    <!-- Simple Search -->
+    <div class="simple-search">
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchCourses" placeholder="Search courses..." 
+                   onkeyup="filterCourses()">
+        </div>
+    </div>
+
+    <!-- Courses List -->
+    <div class="courses-container">
+        {% if offerings %}
+            <div class="courses-list">
+                {% for offering in offerings %}
+                <div class="course-item">
+                    <div class="course-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    
+                    <div class="course-info">
+                        <div class="course-header">
+                            <h3>{{ offering.title }}</h3>
+                            <span class="course-category">{{ offering.category|default:"General" }}</span>
+                        </div>
+                        
+                        <p class="course-desc">{{ offering.description }}</p>
+                        
+                        <div class="course-details">
+                            <span><i class="fas fa-user"></i> {{ offering.instructor|default:"Staff" }}</span>
+                            <span><i class="fas fa-clock"></i> {{ offering.duration|default:"Self-paced" }}</span>
+                            <span><i class="fas fa-users"></i> {{ offering.enrolled|default:"0" }} enrolled</span>
+                        </div>
+                        
+                        <div class="course-actions">
+                            {% if user_id %}
+                                {% if offering.id in subscribed_ids %}
+                                    <button class="subscribe-btn subscribed" disabled>
+                                        <i class="fas fa-check"></i> Subscribed
+                                    </button>
+                                {% else %}
+                                    <button class="subscribe-btn" onclick="subscribe({{ offering.id }}, this)">
+                                        <i class="fas fa-plus"></i> Subscribe
+                                    </button>
+                                {% endif %}
+                            {% else %}
+                                <a href="/login/?next=/offerings" class="subscribe-btn login-btn">
+                                    <i class="fas fa-sign-in-alt"></i> Login to Subscribe
+                                </a>
+                            {% endif %}
+
+                            <a href="/course/{{ offering.id }}" class="view-btn">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-courses">
+                <i class="fas fa-book-open fa-3x"></i>
+                <h3>No courses available</h3>
+                <p>Check back later for new course offerings.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Simple Footer -->
+    <footer class="simple-footer">
+        <p>© 2024 Student Portal</p>
+        <p><a href="/dashboard">Back to Dashboard</a></p>
+    </footer>
+
+    <script>
+        function filterCourses() {
+            const searchTerm = document.getElementById('searchCourses').value.toLowerCase();
+            const courses = document.querySelectorAll('.course-item');
+            
+            courses.forEach(course => {
+                const title = course.querySelector('h3').textContent.toLowerCase();
+                const desc = course.querySelector('.course-desc').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || desc.includes(searchTerm)) {
+                    course.style.display = 'flex';
+                } else {
+                    course.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
